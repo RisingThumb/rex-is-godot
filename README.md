@@ -3,6 +3,13 @@ This is a utility project for utilising the .xp binary file format that is the o
 
 Currently it doesn't work for .xp files out of the box. You must first unzip them via gzip before use in your project.
 
+# TODO
+- [ ] Make it able to read straight from a .xp file. All the hard work of reading the decompressed .xp file is done.
+
+On this point, I suspect it has to do with the header information. Godot has a method for the File class called `open_compressed` taking 3 parameters, filename, mode and compression. I know the compression should be `File.COMPRESSION_GZIP`, however doing this it does not work.
+
+This [issue](https://github.com/godotengine/godot/issues/28999) elaborates more on the problem. If I am able to fix it, I will update this repository with the fix.
+
 # Documentation
 
 This includes a single scene with a single script and a single decompressed .xp file as an example.
