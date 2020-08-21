@@ -2,12 +2,40 @@ extends Node2D
 
 
 func _ready():
-	var rex = readOffXPData("res://XPFiles/uncompressed.xp")
+	print(File.COMPRESSION_DEFLATE)
+	print(File.COMPRESSION_FASTLZ)
+	print(File.COMPRESSION_GZIP)
+	print(File.COMPRESSION_ZSTD)
+	var rex = readOffXPData("res://XPFiles/TEST!.xp")
 	print(rex.get("versionInfo"))
 
-func readOffXPData(fileName):
+func fixHeader(fileName):
 	var file = File.new()
 	file.open(fileName, File.READ)
+	var length = file.get_len()
+	var buffer = file.get_buffer(length)
+	file.close()
+	file.open(fileName+".rex", File.WRITE_READ)
+	file.store_32(0x46504347)
+	# FastLZ = 0
+	# Deflate = 1
+	# ZSTD = 2
+	# Gzip = 3
+	file.store_32(0x00000003) # compression method
+	file.store_32(0x00001000)
+	file.store_32(length*16)
+	file.store_32(length)
+	file.store_buffer(buffer)
+	file.store_32(0x00000000)
+	file.store_32(0x46504347)
+	file.close()
+	pass
+
+func readOffXPData(fileName):
+	fixHeader(fileName)
+	var file = File.new()
+	#file.open(fileName, File.READ)
+	file.open_compressed(fileName+".rex", File.READ, File.COMPRESSION_GZIP)
 	var rexImage = {}
 	var versionInfo = file.get_32()
 	rexImage["versionInfo"] = versionInfo
