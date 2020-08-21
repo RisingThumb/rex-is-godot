@@ -14,8 +14,8 @@ The script has a function `readOffXPData`. Copy this into your project as necess
 
 #### Expected Output:
 - Dictionary with following keys:
-    - "versionInfo" Integer, with a value relating to the .xp versionInfo information.
-    - "layerCount" Integer, with a value that is the total number of layers
+    - "versionInfo" : Integer, with a value relating to the .xp versionInfo information.
+    - "layerCount" : Integer, with a value that is the total number of layers
     - "layers": Array of type Dict, with a value that is an array of dictionarys. Each index corresponds with a layer. Below is an example dictionary with keys.
         - "height" : Integer,  Height in cells of the layer
         - "width" : Integer, Width in cells of the layer
