@@ -3,7 +3,7 @@ extends Node2D
 
 func _ready():
 	var rex = readOffXPDate("res://XPFiles/uncompressed.xp")
-	print(rex.get("layers")[0].get("image")[0].get("ascii"))
+	print(rex.get("versionInfo"))
 
 func readOffXPDate(fileName):
 	var file = File.new()
@@ -33,11 +33,10 @@ func readOffXPDate(fileName):
 				bgC.r8 = file.get_8()
 				bgC.g8 = file.get_8()
 				bgC.b8 = file.get_8()
+				fgC.a = 1
 				if bgC.r8 == 255 and bgC.g8 == 0 and bgC.b8 == 255: # Undrawn cell, background of 255, 0, 255 means transparent
-					fgC.a = 0
 					bgC.a = 0
 				else:
-					fgC.a = 1
 					bgC.a = 1
 				var characterData = {"ascii": asciicode, "foregroundColour": fgC, "backgroundColour": bgC}
 				layerData.get("image").append(characterData)
