@@ -35,3 +35,5 @@ layers:[
         width:10}]
 versionInfo: 4294967295}
 ```
+## License
+MIT License. See the License file included for more information.
