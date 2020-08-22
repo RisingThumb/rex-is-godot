@@ -1,41 +1,30 @@
 extends Node2D
 
-
 func _ready():
-	print(File.COMPRESSION_DEFLATE)
-	print(File.COMPRESSION_FASTLZ)
-	print(File.COMPRESSION_GZIP)
-	print(File.COMPRESSION_ZSTD)
 	var rex = readOffXPData("res://XPFiles/TEST!.xp")
-	print(rex.get("versionInfo"))
+	print(rex.get("layerCount"))
 
-func fixHeader(fileName):
+func readOffXPData(fileName):
+	var decompressedFileName = "res://decompressFile.xp"
 	var file = File.new()
-	file.open(fileName, File.READ)
+
+	# Read the compressed xp file for its buffer
+	# This is a workaround as open_compressed doesn't work with .xp files
+	file.open(fileName, file.READ)
 	var length = file.get_len()
 	var buffer = file.get_buffer(length)
 	file.close()
-	file.open(fileName+".rex", File.WRITE_READ)
-	file.store_32(0x46504347)
-	# FastLZ = 0
-	# Deflate = 1
-	# ZSTD = 2
-	# Gzip = 3
-	file.store_32(0x00000003) # compression method
-	file.store_32(0x00001000)
-	file.store_32(length*16)
-	file.store_32(length)
-	file.store_buffer(buffer)
-	file.store_32(0x00000000)
-	file.store_32(0x46504347)
-	file.close()
-	pass
 
-func readOffXPData(fileName):
-	fixHeader(fileName)
-	var file = File.new()
-	#file.open(fileName, File.READ)
-	file.open_compressed(fileName+".rex", File.READ, File.COMPRESSION_GZIP)
+	# Perform decompression and save it to a temporary file
+	file.open(decompressedFileName, file.WRITE_READ)
+
+	# The length * 50, is a guess. If it starts failing, try bumping it up
+	# It's a guess because I don't know the actual buffer size it will be
+	file.store_buffer(buffer.decompress(length*50, File.COMPRESSION_GZIP))
+	file.close()
+
+	# Open the file normally
+	file.open(decompressedFileName, file.READ)
 	var rexImage = {}
 	var versionInfo = file.get_32()
 	rexImage["versionInfo"] = versionInfo
@@ -71,4 +60,6 @@ func readOffXPData(fileName):
 									"backgroundColour": bgC}
 				layerData.get("image").append(characterData)
 	file.close()
+	var dir = Directory.new()
+	dir.remove(decompressedFileName)
 	return rexImage
