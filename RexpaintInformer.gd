@@ -13,14 +13,20 @@ func readOffXPData(fileName):
 	file.open(fileName, file.READ)
 	var length = file.get_len()
 	var buffer = file.get_buffer(length)
+	var newbuffer = PoolByteArray()
+	var filled = true
 	file.close()
 
 	# Perform decompression and save it to a temporary file
 	file.open(decompressedFileName, file.WRITE_READ)
 
-	# The length * 50, is a guess. If it starts failing, try bumping it up
-	# It's a guess because I don't know the actual buffer size it will be
-	file.store_buffer(buffer.decompress(length*50, File.COMPRESSION_GZIP))
+	# We don't know the decompressed file size so we iterate towards it with a multiplier
+	var i = 4
+	while (newbuffer.size() <= 0):
+		newbuffer = buffer.decompress(length*i, File.COMPRESSION_GZIP)
+		i*=2
+	
+	file.store_buffer(newbuffer)
 	file.close()
 
 	# Open the file normally
